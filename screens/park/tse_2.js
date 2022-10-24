@@ -17,7 +17,7 @@ export default function App() {
         <View style={styles.container}>
             <Image source={imageMap} />
             <Text style={{fontSize: 20, color: '#343434'}}>
-                ลานจอดรถคณะวิศวะ 1
+                ลานจอดรถคณะวิศวะ 2
             </Text>
             <Text style={{fontSize: 14, color: '#818181', marginBottom: 40}}>
                 พื้นที่จอดรถสาธารณะ

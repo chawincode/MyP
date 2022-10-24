@@ -9,7 +9,7 @@ import Motorcycle from '../screens/Motorcycle';
 import Bicycle from '../screens/Bicycle';
 import Book from '../screens/Book';
 import Report from '../screens/Report';
-import Tse_1 from '../screens/park/tse_1'
+import Tse_1 from '../screens/park/tse_2'
 import Map from '../screens/Map'
 import { useNavigation } from '@react-navigation/native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
