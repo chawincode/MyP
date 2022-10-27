@@ -21,7 +21,7 @@ function PageStack() {
   const navigation = useNavigation();
   return (
     <Stack.Navigator 
-      initialRouteName='Car'
+      initialRouteName='Book'
       screenOptions={({ route, }) => ({
         tabBarIcon: ({ image, focused }) => {
           if (route.name == 'Car') {
