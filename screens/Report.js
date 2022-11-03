@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState }  from "react";
 import {
   ImageBackground,
   View,
@@ -6,31 +6,77 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
-  Dimensions
+  Dimensions,
+  Button,
+  Alert
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ScrollView, TextInput } from "react-native-gesture-handler";
 import SelectDropdown from "react-native-select-dropdown";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
+import { useSelector, useDispatch } from 'react-redux';
 
 
-
-const metier = ["1", "2", "summer"];
-const course = ["SF341", "SF333", "SF327"];
-
+const pb = ["PB1", "PB2", "PB2"];
+const imageMap = require('../assets/map/fullTsePark2.png');
 const {height: SCREEN_HEIGHT} = Dimensions.get('window');
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
+const aleartforsubmit = () => {
+  Alert.alert('รายงานสำเร็จ!', 'ดำเนินการรายงานไปยังเจ้าหน้าที่เรียบร้อย')
+};
 
-export default function Petition() {
+
+
+export default function Report() {
   const navigation = useNavigation();
+  const { park, parkInfo, park2, parkInfo2, parkLatitude, parkLongtitude, parkImage } = useSelector(state => state.dbReducer);
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ postName: 'message' })
+  };
+
+  const postReport = async () => {
+    try {
+      await fetch('http:/192.168.1.132:3001/report/create', requestOptions)
+        .then(response => {
+          response.json()
+              .then(data => {
+                Alert.alert('รายงานสำเร็จ!', 'ดำเนินการรายงานไปยังเจ้าหน้าที่เรียบร้อย')
+              });
+      })
+    } catch (error) {
+        console.error(error);
+    }
+  }
+
+  const data = [];
+
   return (
+    
     <View style={styles.view}>
-        <Text style={styles.textPet}>PETITION</Text>
-        <Text style={styles.textSub}>SUBJECT</Text>
-        <Text style={styles.textTerm}>TERM</Text>
-        <Text style={styles.textCourse}>COURSE</Text>
-        <Text style={styles.textDes}>DESCRIPTION</Text>
+        <View style={styles.container}>
+          <Image style={styles.sizeIMG}
+          source={imageMap} 
+          />
+          
+        </View>
+        
+        <Text style={styles.textPet}>{park + "\n"}
+          <Text style={{fontSize: 14, color: '#818181'}}>
+            {parkInfo}
+          </Text>
+        </Text>
+        <Text style={styles.textSub}>หัวข้อเรื่อง</Text>
+        <Text style={styles.textCourse}>เลือกประเภทปัญหาที่พบ</Text>
+        <View style={styles.addIMG}>
+                    <Button 
+                        color='#14AAF5'
+                        title="+ รูปภาพ"
+                    />
+        </View>
+        <Text style={styles.textDes}>อธิบายปัญหาเพิ่มเติมจากที่คุณพบ</Text>
         <View style={styles.textInput}>
           <TextInput
             placeholder=""
@@ -39,42 +85,9 @@ export default function Petition() {
             style={styles.subject}
           />
         </View>
+       
         <SelectDropdown
-          data={metier}
-          onSelect={(selectedItem, index) => {
-            console.log(selectedItem, index);
-          }}
-          defaultButtonText={" "}
-          buttonTextAfterSelection={(selectedItem, index) => {
-            return selectedItem;
-          }}
-          rowTextForSelection={(item, index) => {
-            return item;
-          }}
-          buttonStyle={styles.dropdown1BtnStyle}
-          buttonTextStyle={styles.dropdown1BtnTxtStyle}
-          renderDropdownIcon={(isOpened) => {
-            return (
-              <FontAwesome
-                name={isOpened ? "chevron-up" : "chevron-down"}
-                color={"#C1C1C1"}
-                size={18}
-              />
-            );
-          }}
-          dropdownIconPosition={"right"}
-          dropdownStyle={styles.dropdown1DropdownStyle}
-          rowTextStyle={styles.dropdown1RowTxtStyle}
-          selectedRowStyle={styles.dropdown1SelectedRowStyle}
-          search
-          searchInputStyle={styles.dropdown1searchInputStyleStyle}
-          searchPlaceHolderColor={"darkgrey"}
-          renderSearchInputLeftIcon={() => {
-            return <FontAwesome name={"search"} color={"#C1C1C1"} size={18} />;
-          }}
-        />
-        <SelectDropdown
-          data={course}
+          data={pb}
           onSelect={(selectedItem, index) => {
             console.log(selectedItem, index);
           }}
@@ -115,6 +128,13 @@ export default function Petition() {
             style={styles.textInputDescription}
           />
         </View>
+        <View style={styles.btnSubmit}>
+          <Button 
+              color='#035397'
+              title="รายงาน"
+              onPress={postReport}
+          />
+        </View>
     </View>
   );
 }
@@ -122,75 +142,63 @@ export default function Petition() {
 const styles = StyleSheet.create({
   view: {
     flex: 1,
-    height: SCREEN_HEIGHT
+    height: SCREEN_HEIGHT,
+    alignSelf: 'center'
   },
   image: {
     flex: 1,
   },
   textPet: {
     position: "absolute",
-    left: 31,
-    top: 50,
-    width: 178,
-    height: 26,
+    top: 210,
     fontSize: 20,
     fontWeight: "400",
     fontStyle: "normal",
-    lineHeight: 20,
     color: "#100F0F",
   },
   textSub: {
     position: "absolute",
-    left: 41,
-    top: 130,
+    top: 260,
     width: 178,
     height: 26,
     fontSize: 20,
     fontWeight: "400",
     fontStyle: "normal",
-    lineHeight: 20,
     color: "#100F0F",
   },
   textTerm: {
     position: "absolute",
-    left: 41,
     top: 240,
     width: 178,
     height: 26,
     fontSize: 20,
     fontWeight: "400",
     fontStyle: "normal",
-    lineHeight: 20,
     color: "#100F0F",
   },
   textCourse: {
     position: "absolute",
-    left: 41,
     top: 340,
-    width: 178,
+    width: 300,
     height: 26,
     fontSize: 20,
     fontWeight: "400",
     fontStyle: "normal",
-    lineHeight: 20,
     color: "#100F0F",
   },
   textDes: {
     position: "absolute",
-    left: 41,
     top: 430,
-    width: 178,
+    width: 300,
     height: 26,
     fontSize: 20,
     fontWeight: "400",
     fontStyle: "normal",
-    lineHeight: 20,
     color: "#100F0F",
   },
   textInput: {
     position: "absolute",
-    left: 41,
-    top: 160,
+    top: 290,
     width: 294,
     height: 42,
     borderRadius: 10,
@@ -213,27 +221,11 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     left: 4,
   },
-  dropdown1BtnStyle: {
-    position: "absolute",
-    left: 41,
-    top: 266,
-    width: 90,
-    height: 42,
-    borderRadius: 10,
-    backgroundColor: "#FFFFFF",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 16,
-    },
-    shadowOpacity: 1,
-    shadowRadius: 1,
-  },
+  
 
   dropdownCourseBtnStyle: {
     position: "absolute",
-    left: 42,
-    top: 365,
+    top: 380,
     width: 200,
     height: 42,
     borderRadius: 10,
@@ -256,8 +248,7 @@ const styles = StyleSheet.create({
   },
   Description: {
     position: "absolute",
-    left: 41,
-    top: 454,
+    top: 470,
     width: 294,
     height: 90,
     borderRadius: 10,
@@ -324,4 +315,29 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     top: 7,
   },
+  addIMG: {
+    width: 118,
+    height: 40,
+    top: 405,
+    borderRadius:10
+  },
+  btnSubmit: {
+    width: 300,
+    height: 50,
+    top: 412,
+    borderRadius:10
+  },
+  container: {
+    paddingTop:20,
+    alignSelf: 'center'
+  },
+  sizeIMG:{
+    width:300,
+    height:150,
+  },
+  btnMap: {
+    alignSelf: 'stretch',
+    color: '#343434',
+    fontSize: 20
+  }
 });
