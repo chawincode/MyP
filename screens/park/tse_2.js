@@ -5,6 +5,7 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import { ScrollView } from 'react-native-gesture-handler';
+import ImagesSwiper from "react-native-image-swiper";
 
 const buttonImageReport = require('../../assets/button/btnProblem.png');
 const buttonImageNavi = require('../../assets/button/btnRoute.png');
@@ -14,11 +15,17 @@ const {height: SCREEN_HEIGHT} = Dimensions.get('window');
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
 export default function App() {
+    // const park =  this.props.navigation.state.params.p1
     const navigation = useNavigation();
-    const { park, parkInfo } = useSelector(state => state.dbReducer);
+    const { park, parkInfo, parkImage } = useSelector(state => state.dbReducer);
     return (
         <View style={styles.container}>
-            <Image source={imageMap} />
+            <ImagesSwiper 
+                images={parkImage}
+                autoplay={true}
+                autoplayTimeout={1.5} 
+                showsPagination={false}
+            />
             <Text style={{fontSize: 20, color: '#343434'}}>
                 {park}
             </Text>
@@ -26,7 +33,7 @@ export default function App() {
                 {parkInfo}
             </Text>
             <View style={styles.btn}>
-                <TouchableOpacity onPress = {() => navigation.navigate('Map', {}) }>
+                <TouchableOpacity onPress = {() => navigation.navigate('Map', {ID: 1}) }>
                     <Image source={buttonImageNavi}/>
                 </TouchableOpacity>
                 <TouchableOpacity onPress = {() => navigation.navigate('Report', {}) }>
@@ -39,10 +46,9 @@ export default function App() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flex: 3,
         backgroundColor: '#fff',
         alignItems: 'center',
-        justifyContent: 'center',
     },
     btn: {
         alignSelf: 'center',

@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, SafeAreaView, VirtualizedList, ScrollView, Touc
 import SelectDropdown from 'react-native-select-dropdown';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
-import { setPark, setParkInfo } from '../redux/action';
+import { setPark, setPark2, setPark3, setPark4, setPark5, setPark6, setPark7, setPark8, setPark9, setPark10, setPark11, setPark12, setPark13, setPark14, setPark15, setPark16} from '../redux/action';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const HeadImage = require('../assets/images/HeaderHome.png');
@@ -12,7 +12,7 @@ const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
 export default function App() {
   const navigation = useNavigation();
-  const { park, parkInfo } = useSelector(state => state.dbReducer);
+  const { park, parkInfo, park2 } = useSelector(state => state.dbReducer);
   const dispatch = useDispatch();
 
   const search = [
@@ -49,8 +49,55 @@ export default function App() {
             <SelectDropdown
             data={search}
             onSelect={(selectedItem, index) => {
-              // console.log(selectedItem, index);
-              dispatch(setPark(selectedItem));
+              console.log(selectedItem, index);
+              if (index == 0) {
+                dispatch(setPark(selectedItem));
+              }
+              if (index == 1) {
+                dispatch(setPark2(selectedItem));
+              }
+              if (index == 2) {
+                dispatch(setPark3(selectedItem));
+              }
+              if (index == 3) {
+                dispatch(setPark4(selectedItem));
+              }
+              if (index == 4) {
+                dispatch(setPark5(selectedItem));
+              }
+              if (index == 5) {
+                dispatch(setPark6(selectedItem));
+              }
+              if (index == 6) {
+                dispatch(setPark7(selectedItem));
+              }
+              if (index == 7) {
+                dispatch(setPark8(selectedItem));
+              }
+              if (index == 8) {
+                dispatch(setPark(selectedItem));
+              }
+              if (index == 9) {
+                dispatch(setPark(selectedItem));
+              }
+              if (index == 10) {
+                dispatch(setPark(selectedItem));
+              }
+              if (index == 11) {
+                dispatch(setPark(selectedItem));
+              }
+              if (index == 12) {
+                dispatch(setPark(selectedItem));
+              }
+              if (index == 13) {
+                dispatch(setPark(selectedItem));
+              }
+              if (index == 14) {
+                dispatch(setPark(selectedItem));
+              }
+              if (index == 15) {
+                dispatch(setPark(selectedItem));
+              }
             }}
             defaultButtonText={'จอดไหนดี?'}
             
@@ -79,7 +126,8 @@ export default function App() {
             }}
           />
         </View>
-      </ImageBackground>
+        </ImageBackground>
+        <View style={{backgroundColor: '#fff', borderTopLeftRadius: 50, borderTopRightRadius: 50, height: 5, width: '100%'}} />
     </SafeAreaView>
   );
 }
@@ -141,5 +189,10 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         borderBottomWidth: 1,
         borderBottomColor: '#444',
-        },
+    },
+    curve: {
+        borderRadius: 20,
+        backgroundColor: '#fff',
+        width: '100%',
+    }
 });

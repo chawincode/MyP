@@ -1,9 +1,10 @@
-import { StyleSheet, Text, View, SafeAreaView, VirtualizedList, ScrollView, TouchableOpacity, Image, Dimensions, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, VirtualizedList, ScrollView, TouchableOpacity, Image, Dimensions, ImageBackground,FlatList } from 'react-native';
 import SelectDropdown from 'react-native-select-dropdown';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
-import { setPark, setParkInfo } from '../redux/action';
+import { setPark, setParkInfo, SET_PARK2 } from '../redux/action';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import React, { useEffect, useState } from 'react';
 
 const HeadImage = require('../assets/images/HeaderHome.png');
 const imageMap = require('../assets/map/tsePark2.png');
@@ -12,102 +13,57 @@ const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
 export default function App() {
   const navigation = useNavigation();
-  const { park, parkInfo } = useSelector(state => state.dbReducer);
+  const { park, parkInfo, park2, parkInfo2 } = useSelector(state => state.dbReducer);
   const dispatch = useDispatch();
 
-  const search = [
-    "ลานจอดรถคณะวิศวะ 1", 
-    "ลานจอดรถคณะวิศวะ 2", 
-    "ลานจอดรถคณะวิศวะ 3", 
-    "ลานจอดรถคณะ SIIT",
-    "ลานจอดรถยิม 4",
-    "ลานจอดรถหลังสระว่ายน้ำ",
-    "ลานจอดรถหลังClass",
-    "ลานจอดรถหน้ายิม 7",
-    "ลานจอดรถหลังยิม 7",
-    "ลานจอดรถหลังโรงอาหาร sc",
-    "ลานจอดรถใต้สวนป๋วย",
-    "ลานจอดรถหลังสวนป๋วย",
-    "ลานจอดรถข้างบร.5",
-    "ลานจอดรถตรงข้ามบร.4",
-    "ลานจอดรถหลังโรงอาหารgreen",
-    "ลานจอดรถข้างตึกหอใน M"
-  ]
+  const [isLoading, setLoading] = useState(false);
+  const [data, setData] = useState([]);
+  const getMotorcycle = async () => {
+    try {
+     const response = await fetch('http:/192.168.1.132:3001/places/motorcycle');
+     const json = await response.json();
+     setData(json);
+   } catch (error) {
+     console.error(error);
+   } finally {
+     setLoading(false);
+   }
+ }
 
+ useEffect(() => {
+  getMotorcycle();
+ }, []);
   //body
-  const data = [
-    {
-      id: 1,
-      title: "Item 1"
-    },
-    {
-      id: 2,
-      title: "Item 2"
-    },
-    {
-      id: 3,
-      title: "Item 3"
-    },
-    {
-      id: 4,
-      title: "Item 4"
-    },
-    {
-      id: 5,
-      title: "Item 5"
-    }
-  ];
-
-  const getItem = (data, index) => {
-    return data[index]
-  };
-
-  const loadMoreItems = () => {
-    data.push({
-      title: `New Item ${data.length}`,
-      id: data.length
-    });
-  }
-  
-  const Item = (item) => (
-    <View style={styles.item}>
-      <Text style={styles.title}>{item.title}</Text>
-    </View>
-  );
-
-  const Separator = () => (
-    <View style={styles.divider}></View>
-  );
-
-  const EmptyList = () => <Text style={styles.title}>No items :(</Text>;
+  // const data = [
+  //   { id: 0, park: park, parkInfo: "Item 1"},
+  //   { id: 1, park: "Item 2", parkInfo: "Item 1"},
+  //   { id: 2, park: "Item 3", parkInfo: "Item 1"},
+  //   { id: 3, park: "Item 4", parkInfo: "Item 1"},
+  //   { id: 4, park: "Item 5", parkInfo: "Item 1"}
+  // ];
 
   return (
     <SafeAreaView style={{flex: 1}}>
-      <ScrollView style={styles.container}>
-        <View style={styles.btn}>
-          <TouchableOpacity onPress = {() => navigation.navigate('TSE_1', {}) } style={{flexDirection: 'row'}}>
-            <Image source={imageMap} />
-            <Text style={styles.btnMap}>
-              {park + "\n"}
-              <Text style={{fontSize: 14, color: '#818181'}}>
-                  {parkInfo}
+      <FlatList 
+        data={data}
+        contentContainerStyle={{backgroundColor: '#fff' }}
+        renderItem={({ item }) => (
+          <View style={styles.btn}>
+            <TouchableOpacity onPress = {() => navigation.navigate('TSE_1', dispatch(setPark(item.name)), dispatch(setParkInfo(item.description))) } style={{flexDirection: 'row'}}>
+              <Image source={imageMap} />
+              <Text style={styles.btnMap}>
+                {item.name + "\n"}
+                <Text style={{fontSize: 14, color: '#818181'}}>
+                    {item.description}
+                </Text>
+                <Text style={{fontSize: 14, color: '#818181'}}>
+                    {item.place_id}
+                </Text>
               </Text>
-            </Text>
-          </TouchableOpacity>
-        </View>
-        {/* <VirtualizedList
-          style={styles.list}
-          data={data}
-          initialNumToRender={4}
-          ListEmptyComponent={EmptyList}
-          ItemSeparatorComponent={Separator}
-          renderItem={({ item }) => <Item title={item.title} key={item.id} />}
-          keyExtractor={item => item.key}
-          getItemCount={data => data.length}
-          getItem={getItem}
-          onEndReached={loadMoreItems}
-        /> */}
-      </ScrollView>
+            </TouchableOpacity>
+          </View>
+        )}
+      />
     </SafeAreaView>
   );
 }

@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Image, StyleSheet, Pressable, Dimensions } from 'react-native';
+import { Image, StyleSheet, Pressable, Dimensions, View } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import Car from '../screens/Car';
 import Motorcycle from '../screens/Motorcycle';
@@ -16,6 +16,7 @@ import { useNavigation } from '@react-navigation/native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { isAndroid } from "@freakycoder/react-native-helpers";
 import CustomTabHeader from '../screens/CustomTabHeader';
+import { useSelector } from 'react-redux';
 
 const Page = createStackNavigator();
 const Stack = createMaterialTopTabNavigator();
@@ -55,7 +56,7 @@ function PageStack() {
               )
             }
           },
-          tabBarItemStyle: {height: 110, top: -30},
+          tabBarItemStyle: {height: 90, top: -30},
         })}
       >
         <Stack.Screen 
@@ -108,6 +109,7 @@ function PageStack() {
 }
 
 function RootNavigator() {
+  const { park } = useSelector(state => state.dbReducer);
   return (
     <Page.Navigator
     screenOptions={{
@@ -117,9 +119,9 @@ function RootNavigator() {
     >
       <Page.Screen name="Root" component={PageStack} options={{ headerShown: false }} />
       <Page.Group screenOptions={{ presentation: 'modal' }}>
-        <Page.Screen  name="TSE_1" component={Tse_1} options={{ headerShown: false, title: "ลานจอดรถคณะวิศวะ 1"}} />
-        <Page.Screen  name="Map" component={Map} options={{ headerShown: true, title: "MAP"}} />
-        <Page.Screen name="Report" component={Report} options={{title: "Report"}} />
+        <Page.Screen  name="TSE_1" component={Tse_1} options={{ headerShown: true, title: park, headerTitleAlign: 'center'}} />
+        <Page.Screen  name="Map" component={Map} options={{ headerShown: true, title: "MAP", headerTitleAlign: 'center'}} />
+        <Page.Screen name="Report" component={Report} options={{title: "Report", headerTitleAlign: 'center'}} />
       </Page.Group>
       {/* <Page.Screen  name="TSE_1" component={Tse_1} options={{ headerShown: false, title: "ลานจอดรถคณะวิศวะ 1"}} />
       <Page.Screen  name="Map" component={Map} options={{ headerShown: true, title: "MAP"}} />
