@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { setPark, setParkInfo, setParkImage, setParkImage2, setParkImage3, setParkEmptyslot, setParkLatitude, setParkLongtitude } from '../redux/action';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import React, { useEffect, useState } from 'react';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const HeadImage = require('../assets/images/HeaderHome.png');
 const imageMap = require('../assets/map/tsePark2.png');
@@ -43,6 +44,7 @@ export default function App() {
   //   { id: 3, park: "Item 4", parkInfo: "Item 1"},
   //   { id: 4, park: "Item 5", parkInfo: "Item 1"}
   // ];
+  const totalStars = 5;
 
   return (
     <SafeAreaView style={{flex: 1}}>
@@ -65,10 +67,25 @@ export default function App() {
               <Text style={styles.btnMap}>
                 {item.name + "\n"}
                 <Text style={{fontSize: 14, color: '#818181'}}>
-                    {item.description}
-                </Text>
-                <Text style={{fontSize: 14, color: '#818181'}}>
-                    {item.place_id}
+                    {item.description + "\n"}
+                    {
+                      Array.from({length: item.review}, (x, i) => {
+                          return(
+                            <MaterialIcons key={i} name="star" size={20} color="#FFA000"/>
+                          )
+                      })
+                    }
+
+                    {
+
+                      Array.from({length: totalStars-item.review}, (x, i) => {
+                          return(
+                            <MaterialIcons key={i} name="star-border" size={20} color="#FFA000" />
+                          )
+                      })
+
+                    }
+                    {item.quantity == 0 ? <Text style={{color: '#B70000'}}>{"\n" + "เต็ม"}</Text>: <Text style={{color: '#035397'}}>{"\n" + "ว่าง " + item.quantity + " ที่"} </Text> }
                 </Text>
               </Text>
             </TouchableOpacity>
@@ -111,7 +128,8 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     alignSelf: 'stretch',
     color: '#343434',
-    fontSize: 20
+    fontSize: 20,
+    fontFamily: 'Prompt-Regular'
   },
   btn: {
     flexDirection: 'row',

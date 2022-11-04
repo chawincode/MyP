@@ -119,9 +119,10 @@ function RootNavigator() {
     >
       <Page.Screen name="Root" component={PageStack} options={{ headerShown: false }} />
       <Page.Group screenOptions={{ presentation: 'modal' }}>
-        <Page.Screen  name="TSE_1" component={Tse_1} options={{ headerShown: true, title: park, headerTitleAlign: 'center'}} />
-        <Page.Screen  name="Map" component={Map} options={{ headerShown: true, title: "MAP", headerTitleAlign: 'center'}} />
+        <Page.Screen  name="TSE_1" component={Tse_1} options={{ headerShown: false, title: park, headerTitleAlign: 'center'}} />
+        <Page.Screen  name="Map" component={Map} options={{ headerShown: true, title: park, headerTitleAlign: 'center'}} />
         <Page.Screen name="Report" component={Report} options={{title: "Report", headerTitleAlign: 'center'}} />
+        <Page.Screen name="Head" component={CustomTabHeader} options={{headerShadow: false}} />
       </Page.Group>
       {/* <Page.Screen  name="TSE_1" component={Tse_1} options={{ headerShown: false, title: "ลานจอดรถคณะวิศวะ 1"}} />
       <Page.Screen  name="Map" component={Map} options={{ headerShown: true, title: "MAP"}} />

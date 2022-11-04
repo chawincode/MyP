@@ -2,8 +2,12 @@ import { StyleSheet, Text, View, SafeAreaView, VirtualizedList, ScrollView, Touc
 import SelectDropdown from 'react-native-select-dropdown';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
-import { setPark, setPark2, setPark3, setPark4, setPark5, setPark6, setPark7, setPark8, setPark9, setPark10, setPark11, setPark12, setPark13, setPark14, setPark15, setPark16} from '../redux/action';
+import { setPark, setParkInfo, setParkImage, setParkImage2, setParkEmptyslot, setParkLatitude, setParkLongtitude } from '../redux/action';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { TextInput } from 'react-native-gesture-handler';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useFonts } from 'expo-font';
 
 const HeadImage = require('../assets/images/HeaderHome.png');
 const imageMap = require('../assets/map/tsePark2.png');
@@ -11,9 +15,44 @@ const {height: SCREEN_HEIGHT} = Dimensions.get('window');
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    'Prompt-Regular': require('../assets/fonts/Prompt-Regular.ttf'),
+  });
   const navigation = useNavigation();
   const { park, parkInfo, park2 } = useSelector(state => state.dbReducer);
   const dispatch = useDispatch();
+
+  const [isLoading, setLoading] = useState(false);
+  const [data, setData] = useState([]);
+
+  const getPark = async () => {
+     try {
+      const response = await fetch('http:/192.168.1.132:3001/places/All');
+      const json = await response.json();
+      setData(json);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    getPark();
+    loadFont();
+  }, []);
+
+  const loadFont = async() => {
+    try {
+      fontsLoaded
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   const search = [
     "ลานจอดรถคณะวิศวะ 1", 
@@ -46,66 +85,30 @@ export default function App() {
           </Text>
         </View>
         <View style={styles.search} >
+          <MaterialCommunityIcons 
+            style={styles.icon}
+            name={'magnify'}
+            size={20}
+            color='#343434'
+          />
             <SelectDropdown
-            data={search}
+            data={data}
             onSelect={(selectedItem, index) => {
-              console.log(selectedItem, index);
-              if (index == 0) {
-                dispatch(setPark(selectedItem));
-              }
-              if (index == 1) {
-                dispatch(setPark2(selectedItem));
-              }
-              if (index == 2) {
-                dispatch(setPark3(selectedItem));
-              }
-              if (index == 3) {
-                dispatch(setPark4(selectedItem));
-              }
-              if (index == 4) {
-                dispatch(setPark5(selectedItem));
-              }
-              if (index == 5) {
-                dispatch(setPark6(selectedItem));
-              }
-              if (index == 6) {
-                dispatch(setPark7(selectedItem));
-              }
-              if (index == 7) {
-                dispatch(setPark8(selectedItem));
-              }
-              if (index == 8) {
-                dispatch(setPark(selectedItem));
-              }
-              if (index == 9) {
-                dispatch(setPark(selectedItem));
-              }
-              if (index == 10) {
-                dispatch(setPark(selectedItem));
-              }
-              if (index == 11) {
-                dispatch(setPark(selectedItem));
-              }
-              if (index == 12) {
-                dispatch(setPark(selectedItem));
-              }
-              if (index == 13) {
-                dispatch(setPark(selectedItem));
-              }
-              if (index == 14) {
-                dispatch(setPark(selectedItem));
-              }
-              if (index == 15) {
-                dispatch(setPark(selectedItem));
-              }
+              // console.log(selectedItem, index);
+              navigation.navigate('TSE_1',
+                dispatch(setPark(selectedItem.name)), 
+                dispatch(setParkInfo(selectedItem.description)), 
+                dispatch(setParkEmptyslot(selectedItem.quantity)),
+                dispatch(setParkLatitude(selectedItem.latitude)),
+                dispatch(setParkLongtitude(selectedItem.longtitude)),
+                dispatch(setParkImage(selectedItem.img)))
             }}
             defaultButtonText={'จอดไหนดี?'}
-            
-            buttonTextAfterSelection={(selectedItem, index) => {
-              return selectedItem;
+            buttonTextAfterSelection={(item, index) => {
+              return  item.name;
             }}
             rowTextForSelection={(item, index) => {
-              return item;
+              return item.name;
             }}
             buttonStyle={styles.dropdown1BtnStyle}
             buttonTextStyle={styles.dropdown1BtnTxtStyle}
@@ -122,7 +125,7 @@ export default function App() {
             searchPlaceHolder={'Search here'}
             searchPlaceHolderColor={'darkgrey'}
             renderSearchInputLeftIcon={() => {
-              return <FontAwesome name={'search'} color={'#343434'} size={18} />;
+              return <FontAwesome name={'search'} color={'#343434'} fontFamily='Prompt-Regular' size={18} />;
             }}
           />
         </View>
@@ -148,6 +151,7 @@ const styles = StyleSheet.create({
         color: '#035397',
         fontSize: 24,
         fontWeight: 'bold',
+        fontFamily: 'Prompt-Regular'
     },
     textInput: {
         alignSelf: 'stretch',
@@ -158,41 +162,46 @@ const styles = StyleSheet.create({
         left: -2
     },
     icon: {
-        left: 4,
+        left: 3,
         alignSelf: 'center'
     },
     search: {
-        alignSelf: 'center',
-        flexDirection: 'row',
-        fontSize: 15,
-        height: 50,
+        // alignSelf: 'center',
+        // flexDirection: 'row',
+        // fontSize: 15,
+        // height: 50,
         marginLeft: 50,
         marginRight: 50,
-        borderRadius: 10,
-        marginTop: 10
-    },
-    dropdown1BtnStyle: {
+        // borderRadius: 10,
+        marginTop: 10,
         width: SCREEN_WIDTH / 1.1,
         height: 50,
         backgroundColor: '#FAFAFA',
         borderRadius: 10,
         borderWidth: 1,
         borderColor: '#035397',
+        alignSelf: 'center',
+        flexDirection: 'row',
+        fontFamily: 'Prompt-Regular'
     },
-    dropdown1BtnTxtStyle: {color: '#343434', textAlign: 'left'},
+    dropdown1BtnStyle: {
+        width: SCREEN_WIDTH / 1.1,
+        height: 48,
+        backgroundColor: '#FAFAFA',
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: '#FAFAFA',
+        width: '93%',
+    },
+    dropdown1BtnTxtStyle: {color: '#343434', textAlign: 'left', bottom: 2, left: 10, fontFamily: 'Prompt-Regular'},
     dropdown1DropdownStyle: {backgroundColor: '#EFEFEF', borderRadius: 10},
     dropdown1RowStyle: {backgroundColor: '#EFEFEF', borderBottomColor: '#B3B3B3'},
-    dropdown1RowTxtStyle: {color: '#444', textAlign: 'left'},
+    dropdown1RowTxtStyle: {color: '#444', textAlign: 'left', fontFamily: 'Prompt-Regular'},
     dropdown1SelectedRowStyle: {backgroundColor: '#B3B3B3'},
     dropdown1searchInputStyleStyle: {
         backgroundColor: '#EFEFEF',
         borderRadius: 8,
         borderBottomWidth: 1,
         borderBottomColor: '#444',
-    },
-    curve: {
-        borderRadius: 20,
-        backgroundColor: '#fff',
-        width: '100%',
     }
 });
