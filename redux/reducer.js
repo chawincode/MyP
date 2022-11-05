@@ -14,7 +14,7 @@ import { SET_PARK, SET_PARK_INFO, SET_PARK_IMAGE, SET_PARK_STAR, SET_PARK_EMPTYS
     SET_PARK14, SET_PARK_INFO14, SET_PARK_IMAGE14, SET_PARK_STAR14, SET_PARK_EMPTYSLOT14,
     SET_PARK15, SET_PARK_INFO15, SET_PARK_IMAGE15, SET_PARK_STAR15, SET_PARK_EMPTYSLOT15,
     SET_PARK16, SET_PARK_INFO16, SET_PARK_IMAGE16, SET_PARK_STAR16, SET_PARK_EMPTYSLOT16,
-    SET_PARK_LATITUDE, SET_PARK_LONGTITUDE
+    SET_PARK_LATITUDE, SET_PARK_LONGTITUDE, SET_FAVORITE_LIST
 } from "./action";
 
 const initialState = {
@@ -25,6 +25,7 @@ const initialState = {
     parkEmptyslot: 0,
     parkLatitude: '',
     parkLongtitude: '',
+    favoriteList: [],
     park2: '',
     parkInfo2: '',
     parkImage2: 0,
@@ -118,6 +119,8 @@ function dbReducer(state=initialState, action){
             return {...state, parkLatitude: action.payload};
         case SET_PARK_LONGTITUDE:
             return {...state, parkLongtitude: action.payload};
+        case SET_FAVORITE_LIST:
+            return {...state, favoriteList: action.payload};
 
         case SET_PARK2:
             return {...state, park2: action.payload};

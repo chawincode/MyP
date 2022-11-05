@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, SafeAreaView, VirtualizedList, ScrollView, Touc
 import SelectDropdown from 'react-native-select-dropdown';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
-import { setPark, setParkInfo, setParkImage, setParkImage2, setParkImage3, setParkEmptyslot, setParkLatitude, setParkLongtitude } from '../redux/action';
+import { setPark, setParkInfo, setParkImage, setParkImage2, setParkImage3, setParkEmptyslot, setParkLatitude, setParkLongtitude, setFavoriteList } from '../redux/action';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import React, { useEffect, useState } from 'react';
 import { useFonts } from 'expo-font';
@@ -15,7 +15,7 @@ const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
 export default function App() {
   const navigation = useNavigation();
-  const { park, parkInfo, park2, parkInfo2 } = useSelector(state => state.dbReducer);
+  const { park, parkInfo, park2, parkInfo2, favoriteList } = useSelector(state => state.dbReducer);
   const dispatch = useDispatch();
 
   const [fontsLoaded] = useFonts({
@@ -35,6 +35,7 @@ export default function App() {
     try {
      const response = await fetch('http:/192.168.1.132:3001/places/bicycle');
      const json = await response.json();
+     setLoading(true);
      setData(json);
    } catch (error) {
      console.error(error);
@@ -57,8 +58,34 @@ export default function App() {
   // ];
   const totalStars = 5;
 
+  const onFavorite = book => {
+    // setFavoriteList([...favoriteList, book]);
+    // console.log(favoriteList)
+    if (!favoriteList.includes(book)) dispatch(setFavoriteList(favoriteList.concat(book)));
+    // console.log(favoriteList);
+    // navigation.navigate("Book", {favoriteList})
+  };
+
+  // function to remove an item from favorite list
+  const onRemoveFavorite = book => {
+    const filteredList = favoriteList.filter(item => item.place_id !== book.place_id);
+    dispatch(setFavoriteList(filteredList));
+    // let index = favoriteList.indexOf(id);
+    // console.log(index);
+    // let temp = [...favoriteList.slice(0, index), ...favoriteList.slice(index + 1)];
+    // setFavoriteList(temp);
+  };
+
+  const ifExists = book => {
+    if (favoriteList.filter(item => item.place_id === book.place_id).length > 0) {
+      return true;
+    }
+    return false;
+  };
+
   return (
     <SafeAreaView style={{flex: 1}}>
+      {isLoading ? <Text>Loading...</Text> :
       <FlatList 
         data={data}
         contentContainerStyle={{backgroundColor: '#fff' }}
@@ -96,12 +123,23 @@ export default function App() {
 
                     }
                     {item.quantity == 0 ? <Text style={{color: '#B70000'}}>{"\n" + "เต็ม"}</Text>: <Text style={{color: '#035397'}}>{"\n" + "ว่าง " + item.quantity + " ที่"} </Text> }
+                    <TouchableOpacity
+                        style={styles.icon}
+                        onPress={() => ifExists(item) ? onRemoveFavorite(item) : onFavorite(item)}
+                      >
+                      <MaterialIcons
+                        name={ifExists(item) ? 'bookmark' : 'bookmark-outline'}
+                        size={20}
+                        color={'#035397'}
+                      />
+                    </TouchableOpacity>
                 </Text>
               </Text>
             </TouchableOpacity>
           </View>
         )}
       />
+      }
     </SafeAreaView>
   );
 }
@@ -137,7 +175,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     alignSelf: 'stretch',
     color: '#343434',
-    fontSize: 20,
+    fontSize: 15,
     fontFamily: 'Prompt-Regular'
   },
   btn: {

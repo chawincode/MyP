@@ -9,60 +9,99 @@ import {
   Image,
 } from "react-native";
 import { useSelector } from 'react-redux';
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import { GOOGLE_API_KEY } from "../environments";
+import MapViewDirections from "react-native-maps-directions";
+import * as Location from 'expo-location';
 // import Geolocation from '@react-native-community/geolocation';
 // import Geolocation from "react-native-geolocation-service";
 
 const alertcar = require("../assets/icon/AlertCar.png");
 const alertre = require("../assets/icon/ReportAlert.png");
+const carlocation = require("../assets/icon/CarLocation.png");
 
-export default function App() {
+function App() {
   const { park, parkInfo, parkLatitude, parkLongtitude, parkEmptyslot } = useSelector(state => state.dbReducer);
-  const [position, setPosition] = useState({
-    latitude: 14.069905376912853,
-    longitude: 100.60598635193016,
-    latitudeDelta: 0.001,
-    longitudeDelta: 0.001,
+  const { width, height } = Dimensions.get("window");
+  // const [position, setPosition] = useState({
+  //   latitude: 14.069905376912853,
+  //   longitude: 100.60598635193016,
+  //   latitudeDelta: 0.001,
+  //   longitudeDelta: 0.001,
+  // });
+
+  const [destination, setdes] = useState({
+    latitude: Number(parkLatitude),
+    longitude: Number(parkLongtitude),
   });
+
+  const [origin, setOrigin] = useState({ 
+    latitude: Number(parkLatitude),
+    longitude: Number(parkLongtitude),
+  });
+  
+  const ASPECT_RATIO = width / height;
+  const LATITUDE_DELTA = width / height * 0.06;
+  const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+  const INITIAL_POSITION = {
+    latitude: (destination.latitude + origin.latitude)/2,
+    longitude: (destination.longitude + origin.longitude)/2,
+    latitudeDelta: LATITUDE_DELTA,
+    longitudeDelta: LONGITUDE_DELTA,
+  };
 
   const [time, setTime] = useState("5");
   const [dis, setDis] = useState("500");
   const [lot, setLot] = useState("20");
   const [car, setCar] = useState("3");
 
-  // useEffect(() => {
-  //   Geolocation.getCurrentPosition((pos) => {
-  //     const crd = pos.coords;
-  //     setPosition({
-  //       latitude: crd.latitude,
-  //       longitude: crd.longitude,
-  //       latitudeDelta: 0.0421,
-  //       longitudeDelta: 0.0421,
-  //     });
-  //   }).catch((err) => {
-  //     console.log(err);
-  //   });
-  // }, []);
+  React.useEffect(() => {
+    getLocationPermission();
+  }, [])
+
+  async function getLocationPermission() {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if(status !== 'granted') {
+      alert('Permission denied');
+      return;
+    }
+    let location = await Location.getCurrentPositionAsync({});
+    const current = {
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude
+    }
+    setOrigin(current);
+  }
 
   return (
     <View style={styles.container}>
       <MapView
         style={styles.map}
         provider={PROVIDER_GOOGLE}
-        region={{
-          latitude: Number(parkLatitude),
-          longitude: Number(parkLongtitude),
-          latitudeDelta: position.latitudeDelta,
-          longitudeDelta: position.longitudeDelta,
-        }}
+        initialRegion={INITIAL_POSITION}
+        // region={{
+        //   latitude: Number(parkLatitude),
+        //   longitude: Number(parkLongtitude),
+        //   latitudeDelta: position.latitudeDelta,
+        //   longitudeDelta: position.longitudeDelta,
+        // }}
       >
         <MapView.Marker
-          coordinate={{
-            latitude: Number(parkLatitude),
-            longitude: Number(parkLongtitude),
-          }}
+          // coordinate={{
+          //   latitude: Number(parkLatitude),
+          //   longitude: Number(parkLongtitude),
+          // }}
+          coordinate={destination}
           title={park}
           description={parkInfo}
         />
+        <MapView.Marker 
+          Image={carlocation}
+          draggable
+          coordinate={origin}
+          onDragEnd={(direction) => setOrigin(direction.nativeEvent.coordinate)}
+        />
+        <MapViewDirections origin={origin} destination={destination}/>
       </MapView>
       <View style={styles.bottom}>
         <Text style={styles.texttime}>{time} นาที</Text>
@@ -173,3 +212,5 @@ const styles = StyleSheet.create({
     height: 40,
   }
 });
+
+export default App;
